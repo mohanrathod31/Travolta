@@ -1,5 +1,6 @@
 <template>
-  <Tutorial/>
+  <search-form/>
+
 </template>
 
 <script>
