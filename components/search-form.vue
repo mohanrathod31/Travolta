@@ -4,7 +4,7 @@
       <div class="leftcolumn">
         <div class="card">
           <div class="cardImg">
-            <form>
+            <form @submit.prevent="getHotels">
               <div class="d-flex">
                 <div>
                   <label>Destination</label>
@@ -18,41 +18,51 @@
                     placeholder="Please select an option"
                   >
                   </Dropdown>
+                  <label
+                    v-if="!isCitySelected"
+                    style="color: red; font-weight: bold"
+                    >Destination is required</label
+                  >
                 </div>
                 <div>
                   <label>Check-In</label>
-                  <date-picker v-model="checkedInDate" valueType="format"></date-picker>
+                  <date-picker
+                    v-model="checkedInDate"
+                    valueType="format"
+                  ></date-picker>
+                  <label
+                    v-if="!isCheckinDateSelected"
+                    style="color: red; font-weight: bold"
+                    >Check-In date is required</label
+                  >
                 </div>
                 <div>
                   <label>Check-Out</label>
-                  <date-picker v-model="checkedOutDate" valueType="format"></date-picker>
+                  <date-picker
+                    v-model="checkedOutDate"
+                    valueType="format"
+                  ></date-picker>
+                  <label
+                    v-if="!isCheckOutDateSelected"
+                    style="color: red; font-weight: bold"
+                    >Check-Out date is required</label
+                  >
                 </div>
                 <div class="adults">
                   <label>Adults</label>
-                  <input type="text" />
+                  <input v-validate="'required'"  type="text" v-model="noOfAdults" />
                 </div>
                 <div class="adults">
                   <label>Childrens</label>
-                  <input type="text" />
+                  <input v-validate="'required'"  type="text" v-model="noOfChildrens" />
                 </div>
                 <div>
-                  <button v-on:click="getHotels()">SEARCH</button>
+                  <button type="submit">SEARCH</button>
                 </div>
               </div>
             </form>
           </div>
           <br /><br />
-          <p>
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book. It has survived not
-            only five centuries, but also the leap into electronic typesetting,
-            remaining essentially unchanged. It was popularised in the 1960s
-            with the release of Letraset sheets containing Lorem Ipsum passages,
-            and more recently with desktop publishing software like Aldus
-            PageMaker including versions of Lorem Ipsum.
-          </p>
           <p>
             Lorem Ipsum is simply dummy text of the printing and typesetting
             industry. Lorem Ipsum has been the industry's standard dummy text
@@ -70,119 +80,70 @@
   </div>
 </template>
 <script>
+import VeeValidate from 'vee-validate';
 import Dropdown from "vue-simple-search-dropdown";
-import DatePicker from 'vue2-datepicker';
-import 'vue2-datepicker/index.css';
+import DatePicker from "vue2-datepicker";
+import "vue2-datepicker/index.css";
 
 export default {
+  layout: 'travelta',
   components: {
     Dropdown,
     DatePicker,
+    VeeValidate
   },
   data() {
     return {
       show: false,
-      destinations: [
-        {
-          id: 70,
-          name: "Atlanta",
-        },
-        {
-          id: 149,
-          name: "Boston",
-        },
-        {
-          id: 5034,
-          name: "Boston",
-        },
-        {
-          id: 34501,
-          name: "Celebration",
-        },
-        {
-          id: 40418,
-          name: "Edgewood",
-        },
-        {
-          id: 39505,
-          name: "Gotha",
-        },
-        {
-          id: 21017,
-          name: "Haines City",
-        },
-        {
-          id: 10,
-          name: "Los Angeles",
-        },
-        {
-          id: 72,
-          name: "Miami",
-        },
-        {
-          id: 18421,
-          name: "Montverde",
-        },
-        {
-          id: 54,
-          name: "New York",
-        },
-        {
-          id: 23767,
-          name: "Ocoee",
-        },
-        {
-          id: 32190,
-          name: "Orlando area",
-        },
-        {
-          id: 11531,
-          name: "Poinciana",
-        },
-        {
-          id: 10772,
-          name: "Polk City",
-        },
-        {
-          id: 17969,
-          name: "San Francisco Bay",
-        },
-        {
-          id: 17365,
-          name: "St. Cloud",
-        },
-        {
-          id: 24263,
-          name: "Walt Disney World® Resort",
-        },
-        {
-          id: 277,
-          name: "Washington",
-        },
-        {
-          id: 49764,
-          name: "Windermere",
-        },
-        {
-          id: 22282,
-          name: "Winter Garden",
-        },
-      ],
-
+      destinations: [],
+      city: "",
       selected: { name: null, id: null },
       checkedInDate: null,
-      checkedOutDate: null
+      checkedOutDate: null,
+      noOfAdults: 0,
+      noOfChildrens: 0,
+      isCitySelected: true,
+      isCheckinDateSelected: true,
+      isCheckOutDateSelected: true,
     };
   },
+
+  created() {
+    this.getDestinationsData();
+    console.log("destinations");
+    console.log(this.destinations);
+  },
+
   methods: {
     validateSelection(selection) {
       this.selected = selection;
+      this.city = selection.name;
       console.log(selection.name + " has been selected");
-    //  alert(selection.name)
+
+      //  alert(selection.name)
     },
 
-    getHotels(){
-       // alert('Hi')
+    getHotels(event) {
+      if (this.city == undefined) {
+        this.isCitySelected = false;
+        return false
+      } 
+
+        // this.$validator.validateAll().then(result => {
+        // if (result) {
+        //   alert("submit");
+            this.$emit("getHotelList", true);
+            localStorage.setItem("cityName", this.city);
+      //   }
+      // });
+
+    
+    },
+
+    getDestinationsData() {
+      fetch("destinations.json")
+        .then((response) => response.json())
+        .then((data) => (this.destinations = data));
     },
 
     getDropdownValues(keyword) {
