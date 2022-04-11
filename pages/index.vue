@@ -7,6 +7,8 @@
 import HotelList from '../components/hotel-list.vue';
 import searchForm from '../components/search-form.vue';
 export default {
+  //  layout: 'travolta',
+
   components: { searchForm, HotelList },
   
     data() {

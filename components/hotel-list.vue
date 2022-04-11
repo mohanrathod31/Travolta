@@ -1,39 +1,48 @@
 <template>
   <div>
     <div class="row">
+      <div class="header">
+        <a href="#" class="logo"><i class="fa-regular fa-bars"></i> TRAVOLTA</a>
+        <ul>
+          <li><a href="#home" class="active">About Us</a></li>
+          <li><a href="#news">My Bookings</a></li>
+          <li><a href="#about">Sign In</a></li>
+        </ul>
+      </div>
       <div class="leftcolumn">
         <div v-if="searchHotel.length !== 0">
-        <div class="card" v-for="hotel in searchHotel" :key="hotel.id">
-          <div class="cardImg">
-            <div class="grid-item item1">
-              <img
-                src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-              />
-            </div>
-            <div  class="grid-item item2">
-              <h3>{{hotel.name}}</h3>
-              <p>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star"></span>
-                <span class="fa fa-star"></span>
-              </p>
-              <p>
-                {{hotel.address}}, {{hotel.state}}, {{hotel.country_code}}
-              </p>
-            </div>
-            <div class="grid-item item3">
-              <button>Show Details</button>
+          <div class="card" v-for="hotel in searchHotel" :key="hotel.id">
+            <div class="cardImg">
+              <div class="grid-item item1">
+                <img
+                  src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
+                />
+              </div>
+              <div class="grid-item item2">
+                <h3>{{ hotel.name }}</h3>
+                <p>
+                  <span class="fa fa-star checked"></span>
+                  <span class="fa fa-star checked"></span>
+                  <span class="fa fa-star checked"></span>
+                  <span class="fa fa-star"></span>
+                  <span class="fa fa-star"></span>
+                </p>
+                <p>
+                  {{ hotel.address }}, {{ hotel.state }},
+                  {{ hotel.country_code }}
+                </p>
+              </div>
+              <div class="grid-item item3">
+                <button>Show Details</button>
+              </div>
             </div>
           </div>
         </div>
-        </div>
-        
+
         <div v-else>
           <h1>There are no hotels for this locations</h1>
         </div>
-         <infinite-loading @infinite="infiniteHandler"></infinite-loading>
+        <infinite-loading @infinite="infiniteHandler"></infinite-loading>
       </div>
       <div v-if="searchHotel.length !== 0" class="rightcolumn">
         <div class="card">
@@ -70,47 +79,47 @@
       </div>
     </div>
     <div class="grid-item item3">
-      <button v-on:click="goBack()" style="margin-left: 535px;">Back</button>
+      <button v-on:click="goBack()" style="margin-left: 535px">Back</button>
     </div>
   </div>
 </template>
 
 <script>
-import InfiniteLoading from 'vue-infinite-loading';
+import InfiniteLoading from "vue-infinite-loading";
 
 export default {
   components: {
-   InfiniteLoading,
+    InfiniteLoading,
   },
   data() {
     return {
-       hotelsList:[],
-       destination:'',
+      hotelsList: [],
+      destination: "",
     };
   },
 
   computed: {
     searchHotel() {
-     let se = []
-     if(this.destination !== '') {
-      se = this.hotelsList.filter(p => 
-        p.city.toLowerCase().includes(this.destination.toLowerCase())
-      )
-     } else {
-      se = this.hotelsList
-     }
-     return se
-    }
+      let se = [];
+      if (this.destination !== "") {
+        se = this.hotelsList.filter((p) =>
+          p.city.toLowerCase().includes(this.destination.toLowerCase())
+        );
+      } else {
+        se = this.hotelsList;
+      }
+      return se;
+    },
   },
 
   created() {
-   this.destination = localStorage.getItem('cityName');
-   
-  // alert(this.destination)
+    this.destination = localStorage.getItem("cityName");
+
+    // alert(this.destination)
 
     this.getHotelsList();
-      console.log('Hotel list');
-      console.log(this.hotelsList );
+    console.log("Hotel list");
+    console.log(this.hotelsList);
   },
 
   methods: {
@@ -118,24 +127,26 @@ export default {
       this.$emit("getHotelList", false);
     },
 
-     infiniteHandler($state) {
+    infiniteHandler($state) {
       setTimeout(() => {
         const temp = [];
-        for (let i = this.searchHotel.length + 1; i <= this.searchHotel.length + 10; i++) {
+        for (
+          let i = this.searchHotel.length + 1;
+          i <= this.searchHotel.length + 10;
+          i++
+        ) {
           temp.push(i);
         }
         this.searchHotel = this.searchHotel.concat(temp);
         $state.loaded();
       }, 1000);
     },
-  
 
     getHotelsList() {
       fetch("hotels.json")
         .then((response) => response.json())
         .then((data) => (this.hotelsList = data));
     },
-    
   },
 };
 </script>
@@ -214,7 +225,7 @@ body {
 }
 
 .header {
-  background-color: #333;
+  background-color: rgb(248, 243, 243);
   display: flex;
   justify-content: space-between;
 }

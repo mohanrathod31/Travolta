@@ -1,5 +1,13 @@
 <template>
   <div>
+    <div class="header">
+      <a href="#" class="logo"><i class="fa-regular fa-bars"></i> TRAVOLTA</a>
+      <ul>
+        <li><a href="#home" class="active">About Us</a></li>
+        <li><a href="#news">My Bookings</a></li>
+        <li><a href="#about">Sign In</a></li>
+      </ul>
+    </div>
     <div class="row">
       <div class="leftcolumn">
         <div class="card">
@@ -50,11 +58,11 @@
                 </div>
                 <div class="adults">
                   <label>Adults</label>
-                  <input v-validate="'required'"  type="text" v-model="noOfAdults" />
+                  <input type="text" v-model="noOfAdults" />
                 </div>
                 <div class="adults">
                   <label>Childrens</label>
-                  <input v-validate="'required'"  type="text" v-model="noOfChildrens" />
+                  <input type="text" v-model="noOfChildrens" />
                 </div>
                 <div>
                   <button type="submit">SEARCH</button>
@@ -62,35 +70,32 @@
               </div>
             </form>
           </div>
-          <br /><br />
-          <p>
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book. It has survived not
-            only five centuries, but also the leap into electronic typesetting,
-            remaining essentially unchanged. It was popularised in the 1960s
-            with the release of Letraset sheets containing Lorem Ipsum passages,
-            and more recently with desktop publishing software like Aldus
-            PageMaker including versions of Lorem Ipsum.
-          </p>
+        </div>
+      </div>
+      <div v-for="search in recentSearches" :key="search"  v-on:click="getCurrentSearch(search)" class="column">
+        <div class="card">
+          <h3> City : {{search.destination}}</h3>
+          <p>Check in : {{search.checkinDate}}</p>
+          <p>Check out : {{search.checkOutDate}}</p>
+          <p>Adults : {{search.adults}}</p>
+          <p>Childrens : {{search.childrens}}</p>
         </div>
       </div>
     </div>
   </div>
 </template>
 <script>
-import VeeValidate from 'vee-validate';
+import VeeValidate from "vee-validate";
 import Dropdown from "vue-simple-search-dropdown";
 import DatePicker from "vue2-datepicker";
 import "vue2-datepicker/index.css";
 
 export default {
-  layout: 'travelta',
+  layout: "travelta",
   components: {
     Dropdown,
     DatePicker,
-    VeeValidate
+    VeeValidate,
   },
   data() {
     return {
@@ -105,10 +110,13 @@ export default {
       isCitySelected: true,
       isCheckinDateSelected: true,
       isCheckOutDateSelected: true,
+      recentSearches: [],
     };
   },
 
   created() {
+     this.recentSearches = JSON.parse(localStorage.getItem("recentSearches")).slice(0, 4)
+    
     this.getDestinationsData();
     console.log("destinations");
     console.log(this.destinations);
@@ -123,29 +131,46 @@ export default {
       //  alert(selection.name)
     },
 
+    //Method to get restore search
+    getCurrentSearch(item){
+      this.selected = item.destination
+      this.checkedInDate = item.checkinDate
+      this.checkedOutDate = item.checkOutDate
+      this.noOfAdults = item.adults
+      this.noOfChildrens = item.childrens
+    },
+
     getHotels(event) {
       if (this.city == undefined) {
         this.isCitySelected = false;
-        return false
-      } 
+        return false;
+      }
 
-        // this.$validator.validateAll().then(result => {
-        // if (result) {
-        //   alert("submit");
-            this.$emit("getHotelList", true);
-            localStorage.setItem("cityName", this.city);
-      //   }
-      // });
-
+    // Recent Searches implementation
+    if(this.recentSearches == null) this.recentSearches = [];
     
+     var searches = { destination: this.city, checkinDate: this.checkedInDate, checkOutDate: this.checkedOutDate, adults: this.noOfAdults, childrens: this.noOfChildrens }
+    localStorage.setItem("searches", JSON.stringify(searches));
+
+    this.recentSearches.unshift(searches);
+    localStorage.setItem("recentSearches", JSON.stringify(this.recentSearches));
+
+    this.$emit("getHotelList", true);
+    localStorage.setItem("cityName", this.city);
+  
+     console.log('Recent Seraches')
+    console.log(this.recentSearches)
+     
     },
 
+    // Get list of destinations
     getDestinationsData() {
       fetch("destinations.json")
         .then((response) => response.json())
         .then((data) => (this.destinations = data));
     },
 
+     
     getDropdownValues(keyword) {
       console.log(
         "You could refresh options by querying the API with " + keyword
@@ -300,7 +325,49 @@ form {
 .adults {
   width: 120px;
 }
+* {
+  box-sizing: border-box;
+}
 
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Float four columns side by side */
+.column {
+  float: left;
+  width: 25%;
+  padding: 0 10px;
+}
+
+/* Remove extra left and right margins, due to padding */
+.row {
+  margin: 0 -5px;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Responsive columns */
+@media screen and (max-width: 600px) {
+  .column {
+    width: 100%;
+    display: block;
+    margin-bottom: 20px;
+  }
+}
+
+/* Style the counter cards */
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  text-align: center;
+  background-color: #f1f1f1;
+}
 @media screen and (max-width: 767px) {
   body {
     border: solid 0px green;
