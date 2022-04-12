@@ -115,6 +115,7 @@ export default {
   },
 
   created() {
+    if(this.recentSearches !== null)
      this.recentSearches = JSON.parse(localStorage.getItem("recentSearches")).slice(0, 4)
     
     this.getDestinationsData();
