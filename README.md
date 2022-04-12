@@ -6,9 +6,13 @@ Steps to build and Run the project
 
 2. Navigate to our project folder and input the following command:
 
-   npm install nuxt
+  **npm install nuxt**
 
 3. Navigate to project and launch it in the browser:
 
-   cd Travolta
-   npm run dev
+   **cd Travolta**
+   **npm run dev**
+   
+
+       
+   
